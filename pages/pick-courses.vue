@@ -63,9 +63,9 @@ const prevStepEnabled = computed(() => {
       {{ titles[step] }}
     </h1>
     <div class="flex gap-2">
-      <UButton :disabled="nextStepEnabled" @click="nextStep"
-        >مرحله بعدی</UButton
-      >
+      <UButton :disabled="nextStepEnabled" @click="nextStep">
+        مرحله بعدی
+      </UButton>
       <UButton :disabled="prevStepEnabled" @click="prevStep">مرحله قبل</UButton>
     </div>
   </header>
