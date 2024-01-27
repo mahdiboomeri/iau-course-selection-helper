@@ -3,6 +3,9 @@ import { db } from "../utls/db";
 import { course } from "@/db/schema";
 
 export default defineEventHandler(async (event) => {
+  if (process.env.NODE_ENV !== 'development') return {
+    success: false
+  }
   const rawBody = await readBody(event);
   const parsedBody = classes.safeParse(rawBody);
 

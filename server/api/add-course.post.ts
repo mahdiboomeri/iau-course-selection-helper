@@ -4,6 +4,10 @@ import { courses } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export default defineEventHandler(async (event) => {
+  if (process.env.NODE_ENV !== 'development') return {
+    success: false
+  }
+  
   const rawBody = await readBody(event);
   const parsedBody = courseSchema.safeParse(rawBody);
 
