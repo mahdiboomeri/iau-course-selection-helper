@@ -11,6 +11,7 @@
     "db:migrate": "drizzle-kit push:sqlite --config drizzle.config.ts"
   },
   "devDependencies": {
+    "@vue-macros/nuxt": "^1.9.21",
     "drizzle-kit": "^0.20.13",
     "nuxt": "^3.9.3",
     "vue": "^3.4.14",
