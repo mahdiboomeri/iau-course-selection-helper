@@ -1,4 +1,17 @@
 <script setup lang="ts">
+const { data: courses } = await useFetch("/api/classes");
+const { data: classes } = useFetch<
+  {
+    id: number;
+    course_id: string;
+    class_id: string;
+    prof: string;
+    day: Days;
+    start_at: string;
+    end_at: string;
+  }[]
+>("/api/courses");
+
 const steps = {
   courses: "انتخاب دروس",
   classes: "انتخاب کلاس",
@@ -52,6 +65,26 @@ const prevStepEnabled = computed(() => {
   if (step.value === "courses") return true;
   return false;
 });
+
+const activeCalCourse = ref("");
+watch(
+  pickedCourses.value,
+  (val) => {
+    if (!activeCalCourse.value) {
+        console.log(val[0])
+      activeCalCourse.value = val[0];
+    }
+  },
+  { immediate: true }
+);
+
+const pickedClasses = ref<string[]>([]);
+const fullPickedCourses = computed(() =>
+  courses.value?.filter((c) => pickedCourses.value.includes(c.course_id ?? ""))
+);
+const filteredClasses = computed(() =>
+    classes.value?.filter((c) => activeCalCourse.value === c.course_id)
+);
 </script>
 
 <template>
@@ -71,6 +104,23 @@ const prevStepEnabled = computed(() => {
   </header>
 
   <div v-if="step === 'courses'" class="mt-10 grid gird-cols-1 gap-8">
-    <CourseSelector v-model:pickedCourses="pickedCourses" />
+    <CourseSelector
+      :courses="courses ?? []"
+      v-model:pickedCourses="pickedCourses"
+    />
+  </div>
+
+  <div v-if="step === 'classes'" class="my-10">
+    <CourseTab
+      :courses="fullPickedCourses ?? []"
+      v-model:currentCourse="activeCalCourse"
+      :pickedClasses="pickedClasses"
+      class="mb-5"
+    />
+    <ClassSelector
+      :classes="filteredClasses ?? []"
+      :courses="courses ?? []"
+      :selectedCourses="pickedCourses"
+    />
   </div>
 </template>

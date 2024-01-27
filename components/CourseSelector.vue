@@ -1,5 +1,11 @@
 <script setup lang="ts">
-const { data: courses } = await useFetch("/api/classes");
+const props = defineProps<{
+  courses: {
+    id: number;
+    course_id: string | null;
+    name: string | null;
+  }[];
+}>();
 
 const { pickedCourses } = defineModels<{
   pickedCourses: ModelOptions<
@@ -10,7 +16,7 @@ const { pickedCourses } = defineModels<{
   >;
 }>();
 function pickCourse(id: string) {
-  const course = courses.value?.find((c) => c.course_id === id);
+  const course = props.courses?.find((c) => c.course_id === id);
 
   if (!course) return;
 
