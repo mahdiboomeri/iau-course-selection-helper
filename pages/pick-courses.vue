@@ -88,8 +88,10 @@ const fullPickedCourses = computed(() =>
 
 const pickedClasses = ref<string[]>([]);
 const coursesThatHavePickedClasses = computed(() => {
-    return (classes.value ?? []).filter(c => pickedClasses.value.includes(c.class_id))?.map(c => c.course_id);
-})
+  return (classes.value ?? [])
+    .filter((c) => pickedClasses.value.includes(c.class_id))
+    ?.map((c) => c.course_id);
+});
 </script>
 
 <template>
@@ -104,7 +106,9 @@ const coursesThatHavePickedClasses = computed(() => {
       <UButton :disabled="nextStepDisabled" @click="nextStep">
         مرحله بعدی
       </UButton>
-      <UButton :disabled="prevStepDisabled" @click="prevStep">مرحله قبل</UButton>
+      <UButton :disabled="prevStepDisabled" @click="prevStep"
+        >مرحله قبل</UButton
+      >
     </div>
   </header>
 
@@ -129,5 +133,9 @@ const coursesThatHavePickedClasses = computed(() => {
       :courses="courses ?? []"
       :selectedCourses="pickedCourses"
     />
+  </div>
+
+  <div v-if="step === 'export'" class="mt-10">
+    <BaseExporter :courses="courses ?? []" :classes="classes ?? []" :selectedClasses="pickedClasses" />
   </div>
 </template>
