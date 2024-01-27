@@ -1,14 +1,17 @@
 <script setup lang="ts">
+type Event = {
+  id: number;
+  course_id: string;
+  class_id: string;
+  prof: string;
+  day: Days;
+  start_at: string;
+  end_at: string;
+};
 const { events, courses } = defineProps<{
-  events: {
-    id: number;
-    course_id: string;
-    class_id: string;
-    prof: string;
-    day: Days;
-    start_at: string;
-    end_at: string;
-  }[];
+  events: (Event & {
+    conflicts: Event[];
+  })[];
   courses: {
     id: number;
     course_id: string | null;
@@ -16,17 +19,24 @@ const { events, courses } = defineProps<{
   }[];
 }>();
 const { pickedClasses } = defineModels<{
-  pickedClasses: ModelOptions<string[], {
-    defaultValue: []
-  }>;
+  pickedClasses: ModelOptions<
+    string[],
+    {
+      defaultValue: [];
+    }
+  >;
 }>();
 function toggleClasss(class_id: string) {
   if (pickedClasses.value.includes(class_id)) {
     pickedClasses.value = pickedClasses.value.filter((c) => c !== class_id);
   } else {
-    const courseId = events.find(c => c.class_id === class_id)?.course_id;
-    const otherCourses = events.filter(c => c.course_id === courseId)?.map(c => c.class_id) ?? [];
-    pickedClasses.value = pickedClasses.value.filter((c) => !otherCourses.includes(c));
+    const courseId = events.find((c) => c.class_id === class_id)?.course_id;
+    const otherCourses =
+      events.filter((c) => c.course_id === courseId)?.map((c) => c.class_id) ??
+      [];
+    pickedClasses.value = pickedClasses.value.filter(
+      (c) => !otherCourses.includes(c)
+    );
     pickedClasses.value.push(class_id);
   }
 }
@@ -83,6 +93,10 @@ function doEntriesOverlap(
 
   // Check for overlap
   return start1 < end2 && end1 > start2;
+}
+
+function getCourseNameById(id: string) {
+  return courses?.find((c) => c.course_id === id)?.name ?? "-"
 }
 </script>
 <template>
@@ -350,84 +364,66 @@ function doEntriesOverlap(
                 @mouseover="hoverEntry = event.class_id"
                 @mouseleave="hoverEntry = ''"
               >
-                <a
-                  class="group cursor-pointer absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 border-4 border-gray-800"
-                  :class="
-                    pickedClasses.includes(event.class_id)
-                      ? 'bg-primary'
-                      : 'bg-gray-700'
+                <UTooltip
+                  class="w-full"
+                  :text="
+                    event.conflicts.length > 0
+                      ? `این درس با ${getCourseNameById(event.conflicts[0].course_id)} که انتخاب کردی تداخل داره`
+                      : ''
                   "
-                  @click="toggleClasss(event.class_id)"
+                  :ui="{
+                    container: event.conflicts.length > 0 ? '' : 'opacity-0',
+                  }"
                 >
-                  <p
-                    class="order-1 text-base font-bold truncate"
-                    :class="
+                  <a
+                    class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 border-4"
+                    :class="[
                       pickedClasses.includes(event.class_id)
-                        ? 'text-gray-700'
-                        : 'text-zinc-100'
-                    "
+                        ? 'bg-primary'
+                        : 'bg-gray-700',
+                      event.conflicts.length > 0
+                        ? 'border-yellow-600 cursor-not-allowed'
+                        : 'border-gray-800 cursor-pointer',
+                    ]"
+                    @click="event.conflicts.length > 0 ? null : toggleClasss(event.class_id)"
                   >
-                    {{
-                      courses?.find((c) => c.course_id === event.course_id)
-                        ?.name ?? "-"
-                    }}
-                  </p>
-                  <p
-                    class="order-1 text-sm font-bold truncate"
-                    :class="
-                      pickedClasses.includes(event.class_id)
-                        ? 'text-gray-800'
-                        : 'text-white'
-                    "
-                  >
-                    {{ event.prof }}
-                  </p>
-                  <p
-                    class="font-normal"
-                    :class="
-                      pickedClasses.includes(event.class_id)
-                        ? 'text-gray-800'
-                        : 'text-white'
-                    "
-                  >
-                    <span>{{ event.start_at }}</span>
-                    /
-                    <span>{{ event.end_at }}</span>
-                  </p>
-                </a>
+                    <p
+                      class="order-1 text-base font-bold truncate"
+                      :class="
+                        pickedClasses.includes(event.class_id)
+                          ? 'text-gray-700'
+                          : 'text-zinc-100'
+                      "
+                    >
+                      {{
+                       getCourseNameById(event.course_id)
+                      }}
+                    </p>
+                    <p
+                      class="order-1 text-sm font-bold truncate"
+                      :class="
+                        pickedClasses.includes(event.class_id)
+                          ? 'text-gray-800'
+                          : 'text-white'
+                      "
+                    >
+                      {{ event.prof }}
+                    </p>
+                    <p
+                      class="font-normal"
+                      :class="
+                        pickedClasses.includes(event.class_id)
+                          ? 'text-gray-800'
+                          : 'text-white'
+                      "
+                    >
+                      <span>{{ event.start_at }}</span>
+                      /
+                      <span>{{ event.end_at }}</span>
+                    </p>
+                  </a>
+                </UTooltip>
               </li>
-              <!-- <li
-                class="relative mt-px flex sm:col-start-3"
-                style="grid-row: 92 / span 30"
-              >
-                <a
-                  href="#"
-                  class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-pink-50 p-2 text-xs leading-5 hover:bg-pink-100"
-                >
-                  <p class="order-1 font-semibold text-pink-700">
-                    Flight to Paris
-                  </p>
-                  <p class="text-pink-500 group-hover:text-pink-700">
-                    <time datetime="2022-01-12T07:30">7:30 AM</time>
-                  </p>
-                </a>
-              </li>
-              <li
-                class="relative mt-px hidden sm:col-start-6 sm:flex"
-                style="grid-row: 122 / span 24"
-              >
-                <a
-                  href="#"
-                  class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-gray-100 p-2 text-xs leading-5 hover:bg-gray-200"
-                >
-                  <p class="order-1 font-semibold text-gray-700">
-                    Meeting with design team at Disney
-                  </p>
-                  <p class="text-gray-500 group-hover:text-gray-700">
-                    <time datetime="2022-01-15T10:00">10:00 AM</time>
-                  </p>
-                </a>
-              </li> -->
             </ol>
           </div>
         </div>

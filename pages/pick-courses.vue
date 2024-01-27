@@ -41,7 +41,7 @@ const titles: Record<keyof typeof steps, string> = {
   courses: "درس‌هایی که این ترم میخوای برداری رو انتخاب کن",
   classes: "کلاس‌هایی که دوست داری رو از تقویم زیر انتخاب کن",
   // backup: "بکاپ پلن بچین",
-  export: "خرجی بگیر",
+  export: "خروجی بگیر",
 };
 const level: Record<keyof typeof steps, string> = {
   courses: "اول",
@@ -50,8 +50,12 @@ const level: Record<keyof typeof steps, string> = {
   export: "آخر",
 };
 
-const nextStepEnabled = computed(() => {
+const nextStepDisabled = computed(() => {
   if (pickedCourses.value.length === 0) {
+    return true;
+  }
+
+  if (step.value === "classes" && pickedClasses.value.length === 0) {
     return true;
   }
 
@@ -61,7 +65,7 @@ const nextStepEnabled = computed(() => {
 
   return false;
 });
-const prevStepEnabled = computed(() => {
+const prevStepDisabled = computed(() => {
   if (step.value === "courses") return true;
   return false;
 });
@@ -78,12 +82,8 @@ watch(
   { immediate: true }
 );
 
-const activeCourse = ref<string[]>([]);
 const fullPickedCourses = computed(() =>
   courses.value?.filter((c) => pickedCourses.value.includes(c.course_id ?? ""))
-);
-const filteredClasses = computed(() =>
-  classes.value?.filter((c) => activeCalCourse.value === c.course_id)
 );
 
 const pickedClasses = ref<string[]>([]);
@@ -101,10 +101,10 @@ const coursesThatHavePickedClasses = computed(() => {
       {{ titles[step] }}
     </h1>
     <div class="flex gap-2">
-      <UButton :disabled="nextStepEnabled" @click="nextStep">
+      <UButton :disabled="nextStepDisabled" @click="nextStep">
         مرحله بعدی
       </UButton>
-      <UButton :disabled="prevStepEnabled" @click="prevStep">مرحله قبل</UButton>
+      <UButton :disabled="prevStepDisabled" @click="prevStep">مرحله قبل</UButton>
     </div>
   </header>
 
@@ -124,7 +124,8 @@ const coursesThatHavePickedClasses = computed(() => {
     />
     <ClassSelector
       v-model:pickedClasses="pickedClasses"
-      :classes="filteredClasses ?? []"
+      :classes="classes ?? []"
+      :activeCalCourse="activeCalCourse"
       :courses="courses ?? []"
       :selectedCourses="pickedCourses"
     />
