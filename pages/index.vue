@@ -97,8 +97,8 @@ const coursesThatHavePickedClasses = computed(() => {
 <template>
   <BaseSteps :step="step" :steps="steps" class="mt-10" />
 
-  <header class="flex justify-between mt-10">
-    <h1 class="font-bold text-xl">
+  <header class="flex flex-wrap justify-between mt-10 gap-4">
+    <h1 class="font-bold text-xl pl-10">
       <span class="text-zinc-400">مرحله {{ level[step] }}:</span>
       {{ titles[step] }}
     </h1>

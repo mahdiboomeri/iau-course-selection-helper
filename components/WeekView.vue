@@ -96,8 +96,10 @@ function doEntriesOverlap(
 }
 
 function getCourseNameById(id: string) {
-  return courses?.find((c) => c.course_id === id)?.name ?? "-"
+  return courses?.find((c) => c.course_id === id)?.name ?? "-";
 }
+
+const mobileDay = ref<Days>("sat");
 </script>
 <template>
   <div class="flex h-full flex-col ltr">
@@ -110,49 +112,55 @@ function getCourseNameById(id: string) {
           class="sticky top-0 z-30 flex-none bg-gray-800 shadow ring-1 ring-black ring-opacity-5 sm:pr-8"
         >
           <div
-            class="grid grid-cols-7 text-sm leading-6 text-gray-500 sm:hidden"
+            class="grid grid-cols-6 text-sm leading-6 text-gray-500 sm:hidden"
           >
-            <button type="button" class="flex flex-col items-center pt-2 pb-3">
-              M
-              <span
-                class="mt-1 flex h-8 w-8 items-center justify-center font-semibold text-gray-900"
-                >10</span
-              >
+            <button
+              type="button"
+              class="flex flex-col items-center pt-2 pb-3"
+              :class="mobileDay === 'sat' ? 'bg-primary text-gray-800' : ''"
+              @click="mobileDay = 'sat'"
+            >
+              شنبه
             </button>
-            <button type="button" class="flex flex-col items-center pt-2 pb-3">
-              T
-              <span
-                class="mt-1 flex h-8 w-8 items-center justify-center font-semibold text-gray-900"
-                >11</span
-              >
+            <button
+              type="button"
+              class="flex flex-col items-center pt-2 pb-3"
+              :class="mobileDay === 'sun' ? 'bg-primary text-gray-800' : ''"
+              @click="mobileDay = 'sun'"
+            >
+              یک
             </button>
-            <button type="button" class="flex flex-col items-center pt-2 pb-3">
-              W
-              <span
-                class="mt-1 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white"
-                >12</span
-              >
+            <button
+              type="button"
+              class="flex flex-col items-center pt-2 pb-3"
+              :class="mobileDay === 'mon' ? 'bg-primary text-gray-800' : ''"
+              @click="mobileDay = 'mon'"
+            >
+              دو
             </button>
-            <button type="button" class="flex flex-col items-center pt-2 pb-3">
-              T
-              <span
-                class="mt-1 flex h-8 w-8 items-center justify-center font-semibold text-gray-900"
-                >13</span
-              >
+            <button
+              type="button"
+              class="flex flex-col items-center pt-2 pb-3"
+              :class="mobileDay === 'tues' ? 'bg-primary text-gray-800' : ''"
+              @click="mobileDay = 'tues'"
+            >
+              سه
             </button>
-            <button type="button" class="flex flex-col items-center pt-2 pb-3">
-              F
-              <span
-                class="mt-1 flex h-8 w-8 items-center justify-center font-semibold text-gray-900"
-                >14</span
-              >
+            <button
+              type="button"
+              class="flex flex-col items-center pt-2 pb-3"
+              :class="mobileDay === 'wed' ? 'bg-primary text-gray-800' : ''"
+              @click="mobileDay = 'wed'"
+            >
+              چهار
             </button>
-            <button type="button" class="flex flex-col items-center pt-2 pb-3">
-              S
-              <span
-                class="mt-1 flex h-8 w-8 items-center justify-center font-semibold text-gray-900"
-                >15</span
-              >
+            <button
+              type="button"
+              class="flex flex-col items-center pt-2 pb-3"
+              :class="mobileDay === 'thurs' ? 'bg-primary text-gray-800' : ''"
+              @click="mobileDay = 'thurs'"
+            >
+              پنج
             </button>
           </div>
 
@@ -344,14 +352,16 @@ function getCourseNameById(id: string) {
             >
               <li
                 v-for="event in events"
-                class="relative mt-px flex text-right transition-all"
-                :class="
-                  (hoverEntry && hoverEntry !== event.class_id
+                class="relative mt-px text-right transition-all"
+                :class="[
+                  hoverEntry && hoverEntry !== event.class_id
                     ? 'opacity-10'
                     : hoverEntry && hoverEntry === event.class_id
                     ? '!w-full'
-                    : '') + ` ${dayMapper[event.day]}`
-                "
+                    : '',
+                  dayMapper[event.day],
+                  mobileDay !== event.day ? 'hidden sm:flex' : 'flex sm:flex'
+                ]"
                 dir="rtl"
                 :style="`grid-row: ${getEventColPos(event.start_at).toFixed(
                   0
@@ -360,7 +370,7 @@ function getCourseNameById(id: string) {
                   +getEventHeight(event.start_at, event.end_at).toFixed(0) < 20
                     ? '20'
                     : getEventHeight(event.start_at, event.end_at).toFixed(0)
-                }; width: calc(100% - ${countConflictingEntries(event) * 20}%)`"
+                }; width: calc(100% - ${countConflictingEntries(event) * 40}%)`"
                 @mouseover="hoverEntry = event.class_id"
                 @mouseleave="hoverEntry = ''"
               >
@@ -368,7 +378,9 @@ function getCourseNameById(id: string) {
                   class="w-full"
                   :text="
                     event.conflicts.length > 0
-                      ? `این درس با ${getCourseNameById(event.conflicts[0].course_id)} که انتخاب کردی تداخل داره`
+                      ? `این درس با ${getCourseNameById(
+                          event.conflicts[0].course_id
+                        )} که انتخاب کردی تداخل داره`
                       : ''
                   "
                   :ui="{
@@ -385,7 +397,11 @@ function getCourseNameById(id: string) {
                         ? 'border-yellow-600 cursor-not-allowed'
                         : 'border-gray-800 cursor-pointer',
                     ]"
-                    @click="event.conflicts.length > 0 ? null : toggleClasss(event.class_id)"
+                    @click="
+                      event.conflicts.length > 0
+                        ? null
+                        : toggleClasss(event.class_id)
+                    "
                   >
                     <p
                       class="order-1 text-base font-bold truncate"
@@ -395,9 +411,7 @@ function getCourseNameById(id: string) {
                           : 'text-zinc-100'
                       "
                     >
-                      {{
-                       getCourseNameById(event.course_id)
-                      }}
+                      {{ getCourseNameById(event.course_id) }}
                     </p>
                     <p
                       class="order-1 text-sm font-bold truncate"

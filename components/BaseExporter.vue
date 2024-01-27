@@ -17,40 +17,6 @@ const props = defineProps<{
   }[];
 }>();
 
-const days: {
-  label: string;
-  id: Days;
-}[] = [
-  {
-    id: "sat",
-    label: "شنبه",
-  },
-  {
-    id: "sun",
-    label: "یکشنبه",
-  },
-  {
-    id: "mon",
-    label: "دوشنبه",
-  },
-  {
-    id: "tues",
-    label: "سه‌شنبه",
-  },
-  {
-    id: "wed",
-    label: "چهارشنبه",
-  },
-  {
-    id: "thurs",
-    label: "پنجشنبه",
-  },
-  {
-    id: "fri",
-    label: "جمعه",
-  },
-];
-
 const fullSelectedClasses = computed(() => {
   return props.classes
     .filter((c) => props.selectedClasses.includes(c.class_id))
@@ -151,7 +117,7 @@ function copyDaily() {
 
     <h2 class="font-bold">دروسی که باید توی آموزشیار وارد کنی</h2>
     <div
-      class="p-5 rounded-lg bg-gray-800 grid grid-cols-1 gap-2 relative cursor-pointer"
+      class="p-5 rounded-lg bg-gray-800 grid grid-cols-1 gap-2 relative cursor-pointer pt-16"
       @click="copyCodes"
     >
       <UBadge class="absolute left-5 top-5">کلیک کن تا کپی بشه</UBadge>
@@ -162,7 +128,7 @@ function copyDaily() {
 
     <h2 class="font-bold mt-10">برنامه هفتگی</h2>
     <div
-      class="p-5 rounded-lg bg-gray-800 grid grid-cols-1 gap-2 relative cursor-pointer mb-10"
+      class="p-5 rounded-lg bg-gray-800 grid grid-cols-1 gap-2 relative cursor-pointer mb-10 pt-10"
       @click="copyDaily"
     >
       <UBadge class="absolute left-5 top-5">کلیک کن تا کپی بشه</UBadge>
