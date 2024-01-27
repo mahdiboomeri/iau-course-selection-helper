@@ -7,11 +7,18 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "db:migrate": "drizzle-kit push:sqlite --config drizzle.config.ts"
   },
   "devDependencies": {
+    "drizzle-kit": "^0.20.13",
     "nuxt": "^3.9.3",
     "vue": "^3.4.14",
     "vue-router": "^4.2.5"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.4.0",
+    "dotenv": "^16.4.1",
+    "drizzle-orm": "^0.29.3"
   }
 }
