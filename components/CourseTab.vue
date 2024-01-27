@@ -5,7 +5,7 @@ defineProps<{
     course_id: string | null;
     name: string | null;
   }[];
-  pickedClasses: string[];
+  coursesThatHavePickedClasses: string[];
 }>();
 
 const { currentCourse } = defineModels<{
@@ -21,9 +21,10 @@ const { currentCourse } = defineModels<{
       variant="solid"
       size="lg"
       class="cursor-pointer transition-colors"
+      :class="coursesThatHavePickedClasses?.includes(course.course_id ?? '') ? 'border border-primary' : ''"
       @click="currentCourse = course.course_id ?? ''"
     >
-      <UIcon v-if="pickedClasses?.includes(course.course_id ?? '')" name="i-heroicons-check-circle" class="ml-2" />
+      <UIcon v-if="coursesThatHavePickedClasses?.includes(course.course_id ?? '')" name="i-heroicons-check" class="ml-2 text-lg" />
       {{ course.name }}
     </UBadge>
   </div>

@@ -15,7 +15,7 @@ const { data: classes } = useFetch<
 const steps = {
   courses: "انتخاب دروس",
   classes: "انتخاب کلاس",
-  backup: "انتخاب بکاپ",
+  // backup: "انتخاب بکاپ",
   export: "دریافت خروجی",
 } as const satisfies Record<string, string>;
 const step = ref<keyof typeof steps>("courses");
@@ -40,13 +40,13 @@ const pickedCourses = ref<string[]>([]);
 const titles: Record<keyof typeof steps, string> = {
   courses: "درس‌هایی که این ترم میخوای برداری رو انتخاب کن",
   classes: "کلاس‌هایی که دوست داری رو از تقویم زیر انتخاب کن",
-  backup: "بکاپ پلن بچین",
+  // backup: "بکاپ پلن بچین",
   export: "خرجی بگیر",
 };
 const level: Record<keyof typeof steps, string> = {
   courses: "اول",
   classes: "دوم",
-  backup: "سوم",
+  // backup: "سوم",
   export: "آخر",
 };
 
@@ -71,20 +71,25 @@ watch(
   pickedCourses.value,
   (val) => {
     if (!activeCalCourse.value) {
-        console.log(val[0])
+      console.log(val[0]);
       activeCalCourse.value = val[0];
     }
   },
   { immediate: true }
 );
 
-const pickedClasses = ref<string[]>([]);
+const activeCourse = ref<string[]>([]);
 const fullPickedCourses = computed(() =>
   courses.value?.filter((c) => pickedCourses.value.includes(c.course_id ?? ""))
 );
 const filteredClasses = computed(() =>
-    classes.value?.filter((c) => activeCalCourse.value === c.course_id)
+  classes.value?.filter((c) => activeCalCourse.value === c.course_id)
 );
+
+const pickedClasses = ref<string[]>([]);
+const coursesThatHavePickedClasses = computed(() => {
+    return (classes.value ?? []).filter(c => pickedClasses.value.includes(c.class_id))?.map(c => c.course_id);
+})
 </script>
 
 <template>
@@ -114,10 +119,11 @@ const filteredClasses = computed(() =>
     <CourseTab
       :courses="fullPickedCourses ?? []"
       v-model:currentCourse="activeCalCourse"
-      :pickedClasses="pickedClasses"
+      :coursesThatHavePickedClasses="coursesThatHavePickedClasses"
       class="mb-5"
     />
     <ClassSelector
+      v-model:pickedClasses="pickedClasses"
       :classes="filteredClasses ?? []"
       :courses="courses ?? []"
       :selectedCourses="pickedCourses"

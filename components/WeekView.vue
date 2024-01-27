@@ -15,6 +15,21 @@ const { events, courses } = defineProps<{
     name: string | null;
   }[];
 }>();
+const { pickedClasses } = defineModels<{
+  pickedClasses: ModelOptions<string[], {
+    defaultValue: []
+  }>;
+}>();
+function toggleClasss(class_id: string) {
+  if (pickedClasses.value.includes(class_id)) {
+    pickedClasses.value = pickedClasses.value.filter((c) => c !== class_id);
+  } else {
+    const courseId = events.find(c => c.class_id === class_id)?.course_id;
+    const otherCourses = events.filter(c => c.course_id === courseId)?.map(c => c.class_id) ?? [];
+    pickedClasses.value = pickedClasses.value.filter((c) => !otherCourses.includes(c));
+    pickedClasses.value.push(class_id);
+  }
+}
 
 const dayMapper: Record<Days, string> = {
   sat: "sm:col-start-1",
@@ -324,7 +339,9 @@ function doEntriesOverlap(
                     : '') + ` ${dayMapper[event.day]}`
                 "
                 dir="rtl"
-                :style="`grid-row: ${getEventColPos(event.start_at).toFixed(0)} / span ${
+                :style="`grid-row: ${getEventColPos(event.start_at).toFixed(
+                  0
+                )} / span ${
                   hoverEntry === event.class_id &&
                   +getEventHeight(event.start_at, event.end_at).toFixed(0) < 20
                     ? '20'
@@ -334,19 +351,45 @@ function doEntriesOverlap(
                 @mouseleave="hoverEntry = ''"
               >
                 <a
-                  href="#"
-                  class="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-gray-700 p-2 text-xs leading-5 border-4 border-gray-800"
+                  class="group cursor-pointer absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5 border-4 border-gray-800"
+                  :class="
+                    pickedClasses.includes(event.class_id)
+                      ? 'bg-primary'
+                      : 'bg-gray-700'
+                  "
+                  @click="toggleClasss(event.class_id)"
                 >
-                  <p class="order-1 text-base font-bold text-zinc-100 truncate">
+                  <p
+                    class="order-1 text-base font-bold truncate"
+                    :class="
+                      pickedClasses.includes(event.class_id)
+                        ? 'text-gray-700'
+                        : 'text-zinc-100'
+                    "
+                  >
                     {{
                       courses?.find((c) => c.course_id === event.course_id)
                         ?.name ?? "-"
                     }}
                   </p>
-                  <p class="order-1 text-sm font-bold text-white truncate">
+                  <p
+                    class="order-1 text-sm font-bold truncate"
+                    :class="
+                      pickedClasses.includes(event.class_id)
+                        ? 'text-gray-800'
+                        : 'text-white'
+                    "
+                  >
                     {{ event.prof }}
                   </p>
-                  <p class="text-white font-normal">
+                  <p
+                    class="font-normal"
+                    :class="
+                      pickedClasses.includes(event.class_id)
+                        ? 'text-gray-800'
+                        : 'text-white'
+                    "
+                  >
                     <span>{{ event.start_at }}</span>
                     /
                     <span>{{ event.end_at }}</span>

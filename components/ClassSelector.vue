@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   selectedCourses: string[];
   courses: {
     id: number;
@@ -14,10 +14,14 @@ const props = defineProps<{
     day: Days;
     start_at: string;
     end_at: string;
-  }[]
+  }[];
+}>();
+
+const { pickedClasses } = defineModels<{
+  pickedClasses: string[];
 }>();
 </script>
 
 <template>
-  <WeekView :courses="courses ?? []" :events="classes ?? []" />
+  <WeekView v-model:picked-classes="pickedClasses" :courses="courses ?? []" :events="classes ?? []" />
 </template>
