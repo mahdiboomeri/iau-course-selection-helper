@@ -142,6 +142,13 @@ function copyDaily() {
 
 <template>
   <div>
+    <UAlert
+    description="مسئولیت توجه به درست بودن کد‌ها و دابل چک کردن همه چی تو آموزشیار با خودتونه."
+    title="توجه"
+    class="my-10"
+    color="red"
+  />
+
     <h2 class="font-bold">دروسی که باید توی آموزشیار وارد کنی</h2>
     <div
       class="p-5 rounded-lg bg-gray-800 grid grid-cols-1 gap-2 relative cursor-pointer"
@@ -155,7 +162,7 @@ function copyDaily() {
 
     <h2 class="font-bold mt-10">برنامه هفتگی</h2>
     <div
-      class="p-5 rounded-lg bg-gray-800 grid grid-cols-1 gap-2 relative cursor-pointer"
+      class="p-5 rounded-lg bg-gray-800 grid grid-cols-1 gap-2 relative cursor-pointer mb-10"
       @click="copyDaily"
     >
       <UBadge class="absolute left-5 top-5">کلیک کن تا کپی بشه</UBadge>
