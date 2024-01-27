@@ -1,4 +1,6 @@
-# Nuxt 3 Minimal Starter
+# IAU Course Selection Helper
+
+Built with Nuxt 3, Turso, Drizzle ORM and Nuxt UI.
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
