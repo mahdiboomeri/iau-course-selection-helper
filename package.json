@@ -18,7 +18,9 @@
   },
   "dependencies": {
     "@libsql/client": "^0.4.0",
+    "@nuxt/ui": "^2.12.3",
     "dotenv": "^16.4.1",
-    "drizzle-orm": "^0.29.3"
+    "drizzle-orm": "^0.29.3",
+    "zod": "^3.22.4"
   }
 }
