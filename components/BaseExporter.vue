@@ -90,7 +90,7 @@ const daily = computed(() => {
   input += '\n';
 
   input += 'پنجشنبه:\n';
-  filterByDay('fri').forEach(c => {
+  filterByDay('thurs').forEach(c => {
     input +=  `${ c.course_name } => ${ c.start_at } تا ${ c.end_at }\n`
   })
   input += '\n';
