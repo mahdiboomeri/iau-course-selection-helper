@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useStorage } from "@vueuse/core";
 const { data: courses } = await useFetch("/api/classes");
 const { data: classes } = useFetch<
   {
@@ -18,7 +19,12 @@ const steps = {
   // backup: "انتخاب بکاپ",
   export: "دریافت خروجی",
 } as const satisfies Record<string, string>;
-const step = ref<keyof typeof steps>("courses");
+const step = useStorage<keyof typeof steps>(
+  "step",
+  "courses",
+  process.client ? localStorage : undefined,
+  { initOnMounted: true }
+);
 
 function nextStep() {
   const currentStep = Object.entries(steps).findIndex(
@@ -35,8 +41,6 @@ function prevStep() {
   step.value = Object.entries(steps)[currentStep - 1]![0] as keyof typeof steps;
 }
 
-const pickedCourses = ref<string[]>([]);
-
 const titles: Record<keyof typeof steps, string> = {
   courses: "درس‌هایی که این ترم میخوای برداری رو انتخاب کن",
   classes: "کلاس‌هایی که دوست داری رو از تقویم زیر انتخاب کن",
@@ -50,7 +54,15 @@ const level: Record<keyof typeof steps, string> = {
   export: "آخر",
 };
 
-const nextStepDisabled = computed(() => {
+const pickedCourses = useStorage<string[]>(
+  "picked-courses",
+  [],
+  process.client ? localStorage : undefined,
+  {
+    initOnMounted: true,
+  }
+);
+const isNextStepDisabled = computed(() => {
   if (pickedCourses.value.length === 0) {
     return true;
   }
@@ -65,7 +77,7 @@ const nextStepDisabled = computed(() => {
 
   return false;
 });
-const prevStepDisabled = computed(() => {
+const isPrevStepDisabled = computed(() => {
   if (step.value === "courses") return true;
   return false;
 });
@@ -74,8 +86,7 @@ const activeCalCourse = ref("");
 watch(
   pickedCourses.value,
   (val) => {
-    if (!activeCalCourse.value) {
-      console.log(val[0]);
+    if (!activeCalCourse.value && val[0]) {
       activeCalCourse.value = val[0];
     }
   },
@@ -86,7 +97,14 @@ const fullPickedCourses = computed(() =>
   courses.value?.filter((c) => pickedCourses.value.includes(c.course_id ?? ""))
 );
 
-const pickedClasses = ref<string[]>([]);
+const pickedClasses = useStorage<string[]>(
+  "picked-classes",
+  [],
+  process.client ? localStorage : undefined,
+  {
+    initOnMounted: true,
+  }
+);
 const coursesThatHavePickedClasses = computed(() => {
   return (classes.value ?? [])
     .filter((c) => pickedClasses.value.includes(c.class_id))
@@ -103,10 +121,10 @@ const coursesThatHavePickedClasses = computed(() => {
       {{ titles[step] }}
     </h1>
     <div class="flex gap-2">
-      <UButton :disabled="nextStepDisabled" @click="nextStep">
+      <UButton :disabled="isNextStepDisabled" @click="nextStep">
         مرحله بعدی
       </UButton>
-      <UButton :disabled="prevStepDisabled" @click="prevStep"
+      <UButton :disabled="isPrevStepDisabled" @click="prevStep"
         >مرحله قبل</UButton
       >
     </div>
@@ -136,6 +154,10 @@ const coursesThatHavePickedClasses = computed(() => {
   </div>
 
   <div v-if="step === 'export'" class="mt-10">
-    <BaseExporter :courses="courses ?? []" :classes="classes ?? []" :selectedClasses="pickedClasses" />
+    <BaseExporter
+      :courses="courses ?? []"
+      :classes="classes ?? []"
+      :selectedClasses="pickedClasses"
+    />
   </div>
 </template>
